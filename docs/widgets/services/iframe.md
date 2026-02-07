@@ -33,3 +33,29 @@ widget:
   allowScrolling: no # optional, default: yes
   refreshInterval: 2000 # optional, no default
 ```
+
+## Parameters
+
+You can pass parameters to the src using the `iframeParamsChange` event.
+
+```yaml
+widget:
+  type: iframe
+  name: myIframe
+  src: http://example.com/{{param1}}?query={{param2}}
+```
+
+Then, you can trigger the `iframeParamsChange` event with the new parameters:
+
+```javascript
+const event = new CustomEvent("iframeParamsChange", {
+  detail: {
+    param1: "newValue1",
+    param2: "newValue2",
+  },
+});
+window.dispatchEvent(event);
+```
+
+Any parameters passed in the `src` will be replaced with the values from the event. 
+In this example, the new `src` will be `http://example.com/newValue1?query=newValue2`.

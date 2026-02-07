@@ -4,8 +4,25 @@ import { useEffect, useState } from "react";
 
 export default function Component({ service }) {
   const [refreshTimer, setRefreshTimer] = useState(0);
+  const [src, setSrc] = useState("");
 
   const { widget } = service;
+
+  // Listen for iframeParams changes
+  useEffect(() => {
+    // Reaplce placeholders in the src with the current iframeParams
+    const replaceSrc = (src, iframeParams) => setSrc(src.replaceAll(/\{\{(.*?)\}\}/g, (_, key) => iframeParams[key.trim()] || ""))
+
+    replaceSrc(widget?.src || "", window.iframeParams || {});
+
+    const handleParamsChange = (event) => replaceSrc(widget?.src || "", event.detail || {});
+
+    window.addEventListener("iframeParamsChange", handleParamsChange);
+
+    return () => {
+      window.removeEventListener("iframeParamsChange", handleParamsChange);
+    };
+  }, []);
 
   useEffect(() => {
     if (widget?.refreshInterval) {
@@ -29,7 +46,7 @@ export default function Component({ service }) {
         )}
       >
         <iframe
-          src={widget?.src}
+          src={src}
           key={`${widget?.name}-${refreshTimer}`}
           name={widget?.name}
           title={widget?.name}
