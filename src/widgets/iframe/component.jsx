@@ -8,11 +8,12 @@ export default function Component({ service }) {
 
   const { widget } = service;
 
+  const replaceSrc = (src, iframeParams) => setSrc(src.replaceAll(/\{\{(.*?)\}\}/g, (_, key) => iframeParams[key.trim()] || ""))
+
+
   // Listen for iframeParams changes
   useEffect(() => {
     // Reaplce placeholders in the src with the current iframeParams
-    const replaceSrc = (src, iframeParams) => setSrc(src.replaceAll(/\{\{(.*?)\}\}/g, (_, key) => iframeParams[key.trim()] || ""))
-
     replaceSrc(widget?.src || "", window.iframeParams || {});
 
     const handleParamsChange = (event) => replaceSrc(widget?.src || "", event.detail || {});
