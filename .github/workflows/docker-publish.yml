@@ -51,14 +51,14 @@ jobs:
         run: pnpm run lint
 
   build:
-    name: Docker Build & Push
-    if: github.repository == 'gethomepage/homepage'
-    runs-on: self-hosted
+    name: Docker Build & Push on ${{ matrix.platform }}
     needs: [pre-commit]
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
+    runs-on: linux/${{ matrix.platform }}
+    strategy:
+      matrix:
+        platform:
+          - amd64
+          - arm64
 
     steps:
       - name: Checkout repository
