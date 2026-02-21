@@ -33,7 +33,12 @@ export default function Item({ service, groupName, useEqualHeights }) {
   };
 
   return (
-    <li key={service.name} id={service.id} className={classNames("service", service.class)} data-name={service.name || ""}>
+    <li
+      key={service.name}
+      id={service.id}
+      className={classNames("service", service.class)}
+      data-name={service.name || ""}
+    >
       <div
         className={classNames(
           settings.cardBlur !== undefined && `backdrop-blur${settings.cardBlur.length ? "-" : ""}${settings.cardBlur}`,

@@ -8,8 +8,8 @@ export default function Component({ service }) {
 
   const { widget } = service;
 
-  const replaceSrc = (src, iframeParams) => setSrc(src.replaceAll(/\{\{(.*?)\}\}/g, (_, key) => iframeParams[key.trim()] || ""))
-
+  const replaceSrc = (src, iframeParams) =>
+    setSrc(src.replaceAll(/\{\{(.*?)\}\}/g, (_, key) => iframeParams[key.trim()] || ""));
 
   // Listen for iframeParams changes
   useEffect(() => {
