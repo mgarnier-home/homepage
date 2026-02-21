@@ -56,7 +56,11 @@ function getCachedEnvironmentVars() {
   if (!cachedVars) {
     // initialize cache
     cachedVars = Object.entries(process.env).filter(
-      ([key]) => key.includes(homepageVarPrefix) || key.includes(homepageFilePrefix) || key.endsWith(portVariableSuffix) || key.endsWith(ipVariableSuffix),
+      ([key]) =>
+        key.includes(homepageVarPrefix) ||
+        key.includes(homepageFilePrefix) ||
+        key.endsWith(portVariableSuffix) ||
+        key.endsWith(ipVariableSuffix),
     );
     cache.put(cacheKey, cachedVars);
   }

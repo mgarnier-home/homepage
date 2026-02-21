@@ -57,5 +57,5 @@ const event = new CustomEvent("iframeParamsChange", {
 window.dispatchEvent(event);
 ```
 
-Any parameters passed in the `src` will be replaced with the values from the event. 
+Any parameters passed in the `src` will be replaced with the values from the event.
 In this example, the new `src` will be `http://example.com/newValue1?query=newValue2`.

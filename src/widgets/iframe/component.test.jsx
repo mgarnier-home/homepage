@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { describe, expect, it } from "vitest";
 import { act, waitFor } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
 import { renderWithProviders } from "test-utils/render-with-providers";
 
