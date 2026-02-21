@@ -49,6 +49,8 @@ export default async function genericProxyHandler(req, res, map) {
         }
       }
 
+      console.log("Proxying request to with params", url, params);
+
       const [status, contentType, data] = await httpProxy(url, params);
 
       let resultData = data;

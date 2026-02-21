@@ -1,17 +1,17 @@
 name: Docker CI
 
 on:
-  schedule:
-    - cron: '20 0 * * *'
-  push:
-    branches:
-      - main
-      - feature/**
-      - dev
-    tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "dev" ]
-  merge_group:
+  workflow_dispatch:
+    inputs:
+      version-upgrade:
+        description: "How to upgrade the version"
+        required: true
+        type: choice
+        options:
+          - "false"
+          - "patch"
+          - "minor"
+          - "major"
 
 env:
   IMAGE_NAME: ${{ github.repository }}
@@ -42,7 +42,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -54,7 +54,7 @@ jobs:
     name: Docker Build & Push
     if: github.repository == 'gethomepage/homepage'
     runs-on: self-hosted
-    needs: [ pre-commit ]
+    needs: [pre-commit]
     permissions:
       contents: read
       packages: write
@@ -69,8 +69,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.IMAGE_NAME }}
-            ghcr.io/${{ env.IMAGE_NAME }}
+            ${{ vars.IMAGE_NAME }}
           tags: |
             # Default tags
             type=schedule,pattern=nightly
@@ -101,7 +100,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -113,23 +112,12 @@ jobs:
           NEXT_PUBLIC_REVISION="${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}" \
           pnpm run build
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Login to Docker Hub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v3.7.0
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v3
@@ -139,7 +127,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
+          push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
@@ -147,7 +135,6 @@ jobs:
             BUILDTIME=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
             REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
-          platforms: linux/amd64,linux/arm64
           provenance: false
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max

@@ -7,6 +7,8 @@ import cache from "memory-cache";
 const cacheKey = "homepageEnvironmentVariables";
 const homepageVarPrefix = "HOMEPAGE_VAR_";
 const homepageFilePrefix = "HOMEPAGE_FILE_";
+const portVariableSuffix = "_PORT";
+const ipVariableSuffix = "_IP";
 
 export const CONF_DIR = process.env.HOMEPAGE_CONFIG_DIR
   ? process.env.HOMEPAGE_CONFIG_DIR
@@ -54,7 +56,7 @@ function getCachedEnvironmentVars() {
   if (!cachedVars) {
     // initialize cache
     cachedVars = Object.entries(process.env).filter(
-      ([key]) => key.includes(homepageVarPrefix) || key.includes(homepageFilePrefix),
+      ([key]) => key.includes(homepageVarPrefix) || key.includes(homepageFilePrefix) || key.endsWith(portVariableSuffix) || key.endsWith(ipVariableSuffix),
     );
     cache.put(cacheKey, cachedVars);
   }
@@ -67,7 +69,7 @@ export function substituteEnvironmentVars(str) {
     // crude check if we have vars to replace
     const cachedVars = getCachedEnvironmentVars();
     cachedVars.forEach(([key, value]) => {
-      if (key.startsWith(homepageVarPrefix)) {
+      if (key.startsWith(homepageVarPrefix) || key.endsWith(portVariableSuffix) || key.endsWith(ipVariableSuffix)) {
         result = result.replaceAll(`{{${key}}}`, value);
       } else if (key.startsWith(homepageFilePrefix)) {
         const filename = value;
